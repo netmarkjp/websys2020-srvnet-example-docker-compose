@@ -1,0 +1,56 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:1.17.10
+    depends_on:
+      - "app"
+    ports:
+      - "80:80"
+    command:
+      - "nginx"
+      - "-g"
+      - "daemon off;"
+      - "-c"
+      - "/etc/nginx/nginx.conf"
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "socks:/mnt/socks"
+
+  redis:
+    image: redis:5.0.7
+
+  mysql:
+    image: mysql:5.7
+    command:
+      - "--character-set-server=utf8mb4"
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=mypassword
+
+  app:
+    image: python:3.8.2-slim-buster
+    depends_on:
+      - "redis"
+      - "mysql"
+    command:
+      - "python3"
+      - "-m"
+      - "http.server"
+      - "8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=mysite.settings_dev
+      - BASE_URL=http://localhost
+      - REDIS_HOST=redis://redis/0
+      - DB_HOST=db
+      - DB_NAME=mysite
+      - DB_USER=mysite
+      - DB_PASS=mysite
+    ports:
+      - "8000:8000"
+    volumes:
+      - ".:/mnt/host"
+      - "socks:/mnt/socks"
+
+volumes:
+  socks:
