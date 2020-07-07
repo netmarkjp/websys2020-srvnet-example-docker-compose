@@ -46,6 +46,8 @@ services:
       - DB_NAME=mysite
       - DB_USER=mysite
       - DB_PASS=mysite
+      - http_proxy=http://proxy.uec.ac.jp:8080
+      - https_proxy=http://proxy.uec.ac.jp:8080
     ports:
       - "8000:8000"
     volumes:
